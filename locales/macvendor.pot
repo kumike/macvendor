@@ -1,0 +1,66 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025
+# This file is distributed under the same license as the macvendor script.
+# FIRST AUTHOR <you@example.com>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: macvendor 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-19 00:00+0000\n"
+"PO-Revision-Date: 2025-10-19 00:00+0300\n"
+"Last-Translator: YOUR NAME <you@example.com>\n"
+"Language-Team: \n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: macvendor
+msgid "Usage:"
+msgstr ""
+
+#: macvendor
+msgid "Options:"
+msgstr ""
+
+#: macvendor
+msgid "Read MAC addresses from file"
+msgstr ""
+
+#: macvendor
+msgid "Quiet mode: print only vendor name"
+msgstr ""
+
+#: macvendor
+msgid "Show this help message"
+msgstr ""
+
+#: macvendor
+msgid "Examples:"
+msgstr ""
+
+#: macvendor
+msgid "Error: OUI database not found at"
+msgstr ""
+
+#: macvendor
+msgid "Install it with:"
+msgstr ""
+
+#: macvendor
+msgid "Invalid MAC address"
+msgstr ""
+
+#: macvendor
+msgid "Vendor not found"
+msgstr ""
+
+#: macvendor
+msgid "Error: -f requires a filename"
+msgstr ""
+
+#: macvendor
+msgid "Error: file not found"
+msgstr ""
+

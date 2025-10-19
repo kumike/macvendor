@@ -1,0 +1,61 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: macvendor 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-19 00:00+0000\n"
+"PO-Revision-Date: 2025-10-19 00:00+0300\n"
+"Last-Translator: Your Name <you@example.com>\n"
+"Language-Team: Russian\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: macvendor
+msgid "Usage:"
+msgstr "Использование:"
+
+#: macvendor
+msgid "Options:"
+msgstr "Опции:"
+
+#: macvendor
+msgid "Read MAC addresses from file"
+msgstr "Читать MAC-адреса из файла"
+
+#: macvendor
+msgid "Quiet mode: print only vendor name"
+msgstr "Тихий режим: выводить только имя производителя"
+
+#: macvendor
+msgid "Show this help message"
+msgstr "Показать эту справку"
+
+#: macvendor
+msgid "Examples:"
+msgstr "Примеры:"
+
+#: macvendor
+msgid "Error: OUI database not found at"
+msgstr "Ошибка: база OUI не найдена по пути"
+
+#: macvendor
+msgid "Install it with:"
+msgstr "Установите пакет с помощью:"
+
+#: macvendor
+msgid "Invalid MAC address"
+msgstr "Некорректный MAC-адрес"
+
+#: macvendor
+msgid "Vendor not found"
+msgstr "Производитель не найден"
+
+#: macvendor
+msgid "Error: -f requires a filename"
+msgstr "Ошибка: для -f требуется имя файла"
+
+#: macvendor
+msgid "Error: file not found"
+msgstr "Ошибка: файл не найден"
+

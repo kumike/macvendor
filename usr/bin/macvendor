@@ -1,0 +1,86 @@
+#!/bin/bash
+# macvendor - MAC vendor lookup tool
+# Uses ieee-data and supports multiple formats + localization
+
+TEXTDOMAIN=macvendor
+TEXTDOMAINDIR=/usr/share/locale
+
+OUI_FILE="/usr/share/ieee-data/oui.txt"
+
+print_help() {
+    cat <<EOF
+$(gettext "Usage:") macvendor [options] <MAC1> [MAC2 ...]
+$(gettext "Options:")
+  -f FILE    $(gettext "Read MAC addresses from file")
+  -h         $(gettext "Show this help message")
+$(gettext "Examples:")
+  macvendor 00:11:22:33:44:55
+  macvendor 001122334455
+  macvendor -f macs.txt
+EOF
+}
+
+# Check base exists
+if [ ! -f "$OUI_FILE" ]; then
+    echo "$(gettext "Error: OUI database not found at") $OUI_FILE"
+    echo "$(gettext "Install it with:") sudo apt install ieee-data"
+    exit 1
+fi
+
+# No args
+if [ $# -eq 0 ]; then
+    print_help
+    exit 1
+fi
+
+INPUT=()
+
+# Parse args
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -h|--help)
+            print_help
+            exit 0
+            ;;
+        -f)
+            if [[ -z "$2" ]]; then
+                echo "$(gettext "Error: -f requires a filename")"
+                exit 1
+            fi
+            if [[ ! -f "$2" ]]; then
+                echo "$(gettext "Error: file not found") -> $2"
+                exit 1
+            fi
+            mapfile -t file_macs < "$2"
+            INPUT+=("${file_macs[@]}")
+            shift 2
+            ;;
+        *)
+            INPUT+=("$1")
+            shift
+            ;;
+    esac
+done
+
+# Process each MAC
+for mac in "${INPUT[@]}"; do
+    CLEAN=$(echo "$mac" | tr '[:lower:]' '[:upper:]' | sed -E 's/[^0-9A-F]//g')
+
+    if [[ ${#CLEAN} -lt 6 ]]; then
+        echo "$mac -> $(gettext "Invalid MAC address")"
+        continue
+    fi
+
+    OUI=${CLEAN:0:6}
+    OUI_FORMATTED=$(echo "$OUI" | sed -E 's/(..)(..)(..)/\1:\2:\3/')
+
+    VENDOR=$(grep -i "^$OUI_FORMATTED" "$OUI_FILE" | awk -F'\t' '{print $2}' | head -n1)
+
+    if [ -n "$VENDOR" ]; then
+        echo "$mac -> $VENDOR"
+    else
+        echo "$mac -> $(gettext "Vendor not found")"
+    fi
+done
+
+# vim: set filetype=sh :

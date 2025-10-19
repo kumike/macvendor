@@ -1,0 +1,11 @@
+Package: macvendor
+Version: 1.0
+Section: utils
+Priority: optional
+Architecture: all
+Depends: ieee-data, gettext, bash
+Maintainer: Your Name <you@example.com>
+Description: MAC Vendor Lookup Tool
+ A simple shell script that uses ieee-data to find vendor names by MAC address.
+ Supports multiple formats and localization.
+
