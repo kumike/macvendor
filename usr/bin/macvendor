@@ -1,37 +1,57 @@
 #!/bin/bash
+# -*- sh -*-
 # macvendor - MAC vendor lookup tool
 # Uses ieee-data and supports multiple formats + localization
+# Compatible with Debian ieee-data formats
 
 TEXTDOMAIN=macvendor
 TEXTDOMAINDIR=/usr/share/locale
 
-OUI_FILE="/usr/share/ieee-data/oui.txt"
+OUI_DIR="/var/lib//ieee-data"
+
+# Collect databases
+CSV_FILES=($(ls "$OUI_DIR"/oui*.csv 2>/dev/null | sort))
+TXT_FILES=($(ls "$OUI_DIR"/oui*.txt 2>/dev/null | sort))
+
+if [ ${#CSV_FILES[@]} -eq 0 ] && [ ${#TXT_FILES[@]} -eq 0 ]; then
+    echo "No OUI database found in $OUI_DIR"
+    exit 1
+fi
+
+USE_CSV=false
+USE_TXT=false
+
+if [ ${#CSV_FILES[@]} -gt 0 ]; then
+    USE_CSV=true
+else
+    if [ ${#TXT_FILES[@]} -gt 0 ]; then
+        USE_TXT=true
+    fi
+fi
+
+# Colors
+if [ -t 1 ]; then
+    RED=$(tput setaf 1)
+    GREEN=$(tput setaf 2)
+    YELLOW=$(tput setaf 3)
+    RESET=$(tput sgr0)
+else
+    RED="" ; GREEN="" ; YELLOW="" ; RESET=""
+fi
 
 print_help() {
     cat <<EOF
-$(gettext "Usage:") macvendor [options] <MAC1> [MAC2 ...]
-$(gettext "Options:")
-  -f FILE    $(gettext "Read MAC addresses from file")
-  -h         $(gettext "Show this help message")
-$(gettext "Examples:")
+${YELLOW}Usage:${RESET} macvendor [options] <MAC1> [MAC2 ...]
+${YELLOW}Options:${RESET}
+  -f FILE    Read MAC addresses from file
+  -h         Show this help message
+${YELLOW}Examples:${RESET}
   macvendor 00:11:22:33:44:55
   macvendor 001122334455
   macvendor -f macs.txt
+  echo "00-11-22-33-44-55" | macvendor
 EOF
 }
-
-# Check base exists
-if [ ! -f "$OUI_FILE" ]; then
-    echo "$(gettext "Error: OUI database not found at") $OUI_FILE"
-    echo "$(gettext "Install it with:") sudo apt install ieee-data"
-    exit 1
-fi
-
-# No args
-if [ $# -eq 0 ]; then
-    print_help
-    exit 1
-fi
 
 INPUT=()
 
@@ -44,11 +64,11 @@ while [[ $# -gt 0 ]]; do
             ;;
         -f)
             if [[ -z "$2" ]]; then
-                echo "$(gettext "Error: -f requires a filename")"
+                echo "${RED}Error: -f requires a filename${RESET}"
                 exit 1
             fi
             if [[ ! -f "$2" ]]; then
-                echo "$(gettext "Error: file not found") -> $2"
+                echo "${RED}Error: file not found -> $2${RESET}"
                 exit 1
             fi
             mapfile -t file_macs < "$2"
@@ -62,25 +82,77 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Process each MAC
+# Read stdin if no args
+if [ ${#INPUT[@]} -eq 0 ] && [ ! -t 0 ]; then
+    mapfile -t stdin_macs
+    INPUT+=("${stdin_macs[@]}")
+fi
+
+# Lookup in TXT
+lookup_txt() {
+    local oui="$1"
+    local file="$2"
+    awk -v oui="$oui" '
+    BEGIN{IGNORECASE=1}
+    {
+        line=$0
+        gsub(/[- \t]/,"",line)
+        if(index(line, oui)==1){
+            if(match($0, /\)\s*(.*)$/, m)) {
+                print m[1]
+                exit
+            }
+        }
+    }' "$file"
+}
+
+# Lookup in CSV
+lookup_csv() {
+    local oui="$1"
+    local file="$2"
+    awk -F',' -v oui="$oui" '
+    NR>1 {
+        gsub(/"/,"",$0)
+        if(toupper($2)==oui) {
+            print $3
+            exit
+        }
+    }' "$file"
+}
+
+# Process MACs
 for mac in "${INPUT[@]}"; do
     CLEAN=$(echo "$mac" | tr '[:lower:]' '[:upper:]' | sed -E 's/[^0-9A-F]//g')
-
     if [[ ${#CLEAN} -lt 6 ]]; then
-        echo "$mac -> $(gettext "Invalid MAC address")"
+        echo "${RED}$mac -> Invalid MAC address${RESET}"
         continue
     fi
-
     OUI=${CLEAN:0:6}
-    OUI_FORMATTED=$(echo "$OUI" | sed -E 's/(..)(..)(..)/\1:\2:\3/')
 
-    VENDOR=$(grep -i "^$OUI_FORMATTED" "$OUI_FILE" | awk -F'\t' '{print $2}' | head -n1)
+    VENDOR=""
+
+    if $USE_CSV; then
+        for f in "${CSV_FILES[@]}"; do
+            VENDOR=$(lookup_csv "$OUI" "$f")
+            if [ -n "$VENDOR" ]; then
+                break
+            fi
+        done
+    elif $USE_TXT; then
+        for f in "${TXT_FILES[@]}"; do
+            VENDOR=$(lookup_txt "$OUI" "$f")
+            if [ -n "$VENDOR" ]; then
+                break
+            fi
+        done
+    fi
 
     if [ -n "$VENDOR" ]; then
-        echo "$mac -> $VENDOR"
+        echo "${GREEN}$mac -> $VENDOR${RESET}"
     else
-        echo "$mac -> $(gettext "Vendor not found")"
+        echo "${YELLOW}$mac -> Vendor not found${RESET}"
     fi
 done
 
 # vim: set filetype=sh :
+
