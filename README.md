@@ -17,3 +17,5 @@ macvendor -q 00:11:22:33:44:55
 - Russian translation included (`locale/macvendor.po`)
 - Compile `.mo` with `msgfmt macvendor.po -o macvendor.mo`
 
+[![Buy Me a Coffee](https://img.buymeacoffee.com/button-api/?text=Buy+me+a+coffee&emoji=&slug=yourname&button_colour=FFDD00&font_colour=000000&font_family=Arial&outline_colour=000000&coffee_colour=ffffff)](https://donatello.to/MichailKubrak?g=coffee)
+
