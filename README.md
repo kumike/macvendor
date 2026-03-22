@@ -21,3 +21,5 @@ macvendor -q 00:11:22:33:44:55
 
 [![Donate](https://img.shields.io/badge/Support%20Project-2ea44f?style=for-the-badge&logo=githubsponsors&logoColor=white)](https://donatello.to/MichailKubrak?g=coffee)
 
+[![Donate](https://img.shields.io/badge/☕%20Donate%20Me-FF813F?style=for-the-badge&logo=buymeacoffee&logoColor=white)](https://donatello.to/MichailKubrak?g=coffee)
+
